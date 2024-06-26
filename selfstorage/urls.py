@@ -22,7 +22,8 @@ from django.shortcuts import render
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', render, kwargs={'template_name': 'index.html'}, name='start_page'),
-    path('boxes/', render, kwargs={'template_name': 'boxes.html'}, name='box_page'),
+    path('manager/', include('storage.urls')),
+    #path('boxes/', render, kwargs={'template_name': 'boxes.html'}, name='box_page'),
     path('faq/', render, kwargs={'template_name': 'faq.html'}, name='faq_page'),
     path('myrent/', render, kwargs={'template_name': 'my-rent.html'}, name='myrent_page'),
 
