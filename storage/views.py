@@ -3,11 +3,11 @@ from django.shortcuts import render
 def view_products(request):
     boxes =[
         {
-            'name':'тест_Новосибирск',
+            'name':'Новосибирск',
             'address':'ул. Лермонтова д.15_тест',
         },
         {
-            'name':'тест_Иркутск',
+            'name':'Иркутск',
             'address':'ул. Пушкина д.17_тест',
         },
     ]
