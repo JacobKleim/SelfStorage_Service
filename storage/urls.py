@@ -1,11 +1,11 @@
-from django.shortcuts import redirect
-from django.urls import path, include
-from django.shortcuts import render
+from django.urls import path
 
 from . import views
 
-app_name = "storage"
 
 urlpatterns = [
     path('boxes/', views.view_products, name='box_page'),
+    path('register/', views.register_user, name='register'),
+    path('login/', views.login_user, name='login'),
+    path('my_rent/', views.my_rent, name='my_rent'),
 ]
