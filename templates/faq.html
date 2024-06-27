@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,7 +6,7 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-	<link rel="stylesheet" href="Style.css">
+	<link rel="stylesheet" href="{% static 'css/Style.css'%} ">
 	<title>FAQ</title>
 </head>
 <body>
@@ -14,9 +15,9 @@
 		<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
 			<span class="navbar-toggler-icon"></span>
 		</button>
-		<a class="navbar-brand" href="#">
-			<img src="img/Vector.svg" alt="[]">
-			<img src="img/SelfStorage.svg" alt="SelfStorage">
+		<a class="navbar-brand" href="{% url 'start_page' %}">
+			<img src="{% static 'img/Vector.svg' %}" alt="[]">
+			<img src="{% static 'img/SelfStorage.svg' %}" alt="SelfStorage">
 		</a>
 		<div class="collapse navbar-collapse justify-content-end" id="navbar">
 			<ul class="navbar-nav">
@@ -32,10 +33,10 @@
 					<a class="nav-link SelfStorage_black" href="#">Рассчитать стоимость</a>
 				</li>
 				<li class="nav-item me-5">
-					<a class="nav-link SelfStorage_black" href="#">Правила хранения</a>
+					<a class="nav-link SelfStorage_black" href="{% url 'faq_page' %}">Правила хранения</a>
 				</li>
 				<li class="nav-item me-5">
-					<a class="nav-link SelfStorage_black" href="#">Арендовать бокс</a>
+					<a class="nav-link SelfStorage_black" href="{% url 'box_page' %}">Арендовать бокс</a>
 				</li>
 				<li class="nav-item d-flex align-items-center me-5">
 					<a href="#" class="me-2 mb-1">
