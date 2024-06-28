@@ -5,16 +5,9 @@ from phonenumber_field.modelfields import PhoneNumberField
 
 
 class UserProfile(models.Model):
-    user = models.OneToOneField(
-        User,
-        on_delete=models.CASCADE
-    )
-    phone_number = models.CharField(
-        max_length=15
-    )
-    full_name = models.CharField(
-        max_length=255
-    )
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    phone_number = models.CharField(max_length=1)
+    full_name = models.CharField(max_length=255)
 
     def str(self):
         return self.user.username
@@ -113,3 +106,26 @@ class Box(models.Model):
 
     def __str__(self):
         return self.box_number
+
+
+class StorehouseImage(models.Model):
+    number_pic = models.PositiveIntegerField(
+        verbose_name='Номер картинки',
+        default=0,
+        db_index=True,
+        blank=True
+    )
+    storehouse = models.ForeignKey(
+        Storehouse,
+        verbose_name='Склад',
+        on_delete=models.CASCADE,
+        related_name='images')
+    img = models.ImageField(
+        verbose_name='Картинка'
+    )
+
+    class Meta:
+        ordering = ['number_pic']
+
+    def __str__(self):
+        return f'{self.number_pic} {self.storehouse}'
