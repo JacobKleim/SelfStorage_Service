@@ -80,6 +80,11 @@ def login_user(request):
 
 
 def my_rent(request):
+    user_a = UserProfile.objects.filter(user=request.user)
+    if not request.user.is_authenticated:
+        return redirect("login")
+    user = user_a[0]
 
 
-    return render(request, 'my-rent.html')
+
+    return render(request, 'my-rent.html', context={'user':user})
