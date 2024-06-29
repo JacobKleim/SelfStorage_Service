@@ -25,7 +25,7 @@ def view_products(request):
             "images": [image.img.url for image in storehouse.images.all()]
         })
 
-    return render(request, template_name="boxes_t.html",
+    return render(request, template_name="boxes.html",
                   context={'storehouses': store_serialized})
 
 
@@ -80,4 +80,6 @@ def login_user(request):
 
 
 def my_rent(request):
+
+
     return render(request, 'my-rent.html')
