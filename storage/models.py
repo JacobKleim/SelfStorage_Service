@@ -107,25 +107,3 @@ class Box(models.Model):
     def __str__(self):
         return self.box_number
 
-
-class StorehouseImage(models.Model):
-    number_pic = models.PositiveIntegerField(
-        verbose_name='Номер картинки',
-        default=0,
-        db_index=True,
-        blank=True
-    )
-    storehouse = models.ForeignKey(
-        Storehouse,
-        verbose_name='Склад',
-        on_delete=models.CASCADE,
-        related_name='images')
-    img = models.ImageField(
-        verbose_name='Картинка'
-    )
-
-    class Meta:
-        ordering = ['number_pic']
-
-    def __str__(self):
-        return f'{self.number_pic} {self.storehouse}'
