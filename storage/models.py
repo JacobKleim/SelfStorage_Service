@@ -78,6 +78,14 @@ class Box(models.Model):
         db_index=True,
         validators=[MinValueValidator(0)]
     )
+    requestion = models.ForeignKey(
+        'Requestion',
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        related_name='boxes',
+        verbose_name='заяка на аренду бокса',
+    )
 
     def __str__(self):
         return self.box_number
@@ -104,3 +112,36 @@ class StorehouseImage(models.Model):
 
     def __str__(self):
         return f'{self.number_pic} {self.storehouse}'
+
+
+class Requestion(models.Model):
+    """Запрос на хранение вещей."""
+
+    class Status(models.TextChoices):
+        """Статусы заявко
+            SEND - заявка отправлена
+            VIEWED - заявка просмотрена оператором
+            CONTACTED - с клиентом связались для уточнения деталей и оплаты
+            PAID - оплачено
+            DELIVERED - доставляется
+            FINISHED - заявка завершена(либо клиент отказался либо товар приехал).
+        """
+        SEND = 'SD', 'Send'
+        VIEWED = 'VD', 'Viewed'
+        CONTACTED = 'CD', 'Contacted'
+        PAID = 'PD', 'Paid'
+        DELIVERED = 'DD', 'Delivered'
+        FINISHED = 'FD', 'Finished'
+
+    email = models.EmailField(verbose_name='email пользователя')
+    price = models.PositiveSmallIntegerField(
+        null=True,
+        verbose_name='стоимость хранения за год',
+        help_text='высчитывается после обработки заявки',
+    )
+    status = models.CharField(
+        max_length=2,
+        choices=Status.choices,
+        default=Status.SEND,
+        verbose_name='статус заявки',
+    )
