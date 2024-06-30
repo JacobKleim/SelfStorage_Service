@@ -1,3 +1,4 @@
+from django.utils import timezone
 from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
@@ -6,7 +7,7 @@ from phonenumber_field.modelfields import PhoneNumberField
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    phone_number = models.CharField(max_length=1)
+    phone_number = models.CharField(max_length=11)
     full_name = models.CharField(max_length=255)
 
     def str(self):
@@ -106,4 +107,65 @@ class Box(models.Model):
 
     def __str__(self):
         return self.box_number
+
+class Requestion(models.Model):
+    """Запрос на хранение вещей."""
+
+    class Status(models.TextChoices):
+        """Статусы заявко
+            SEND - заявка отправлена
+            VIEWED - заявка просмотрена оператором
+            CONTACTED - с клиентом связались для уточнения деталей и оплаты
+            PAID - оплачено
+            DELIVERED - доставляется
+            FINISHED - заявка завершена(либо клиент отказался либо товар приехал).
+        """
+        SEND = 'SD', 'Send'
+        VIEWED = 'VD', 'Viewed'
+        CONTACTED = 'CD', 'Contacted'
+        PAID = 'PD', 'Paid'
+        DELIVERED = 'DD', 'Delivered'
+        FINISHED = 'FD', 'Finished'
+
+    user = models.ForeignKey(
+        UserProfile,
+        on_delete=models.CASCADE,
+        verbose_name="Арендатор",
+        related_name="rents",
+    )
+    box = models.ForeignKey(
+        Box,
+        on_delete=models.CASCADE,
+        verbose_name="Бокс",
+        related_name="rents"
+    )
+    created_at = models.DateField(
+        verbose_name="Дата создания",
+        default=timezone.now,
+        db_index=True,
+    )
+    expiration_at = models.DateField(
+        verbose_name="Дата окончания аренды",
+        blank=True,
+        null=True,
+        db_index=True,
+    )
+    price = models.PositiveSmallIntegerField(
+        null=True,
+        verbose_name='стоимость хранения за год',
+        help_text='высчитывается после обработки заявки',
+    )
+    status = models.CharField(
+        max_length=2,
+        choices=Status.choices,
+        default=Status.SEND,
+        verbose_name='статус заявки',
+    )
+
+    class Meta:
+        verbose_name = "Аренда"
+        verbose_name_plural = "Аренды"
+
+    def __str__(self):
+        return f"{self.user.full_name} on box {self.box.box_number}"
 
