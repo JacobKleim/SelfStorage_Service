@@ -102,10 +102,4 @@ def my_rent(request):
         })
 
 
-
-
-
-
-
-
-    return render(request, 'my-rent.html', context={'user':user_rent[0]})
+    return render(request, 'my_rent.html', context={'user':user_rent[0]})
