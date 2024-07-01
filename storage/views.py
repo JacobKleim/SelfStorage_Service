@@ -3,8 +3,19 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
 from django.shortcuts import redirect, render
 from django.db.models import Count
+from django.http import HttpResponse
 
-from .models import UserProfile, Storehouse
+from .models import UserProfile, Storehouse, Requestion
+
+
+def count(request):
+    print(request.GET['EMAIL1'])
+    user_mail = request.GET['EMAIL1']
+    Requestion.objects.create(
+        email=user_mail,
+        status='SD'
+    )
+    return HttpResponse('<h1>Заяка отправлена, с Вами свяжутся</h1>')
 
 
 def view_products(request):
@@ -57,6 +68,7 @@ def register_user(request):
                 status=400)
 
     return render(request, 'index.html')
+
 
 
 def login_user(request):

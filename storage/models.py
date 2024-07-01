@@ -2,6 +2,9 @@ from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from phonenumber_field.modelfields import PhoneNumberField
+from django.dispatch import receiver
+from django.db.models.signals import post_save, pre_save
+from django.db.models import Sum
 
 
 class UserProfile(models.Model):
@@ -136,7 +139,7 @@ class Requestion(models.Model):
     email = models.EmailField(verbose_name='email пользователя')
     price = models.PositiveSmallIntegerField(
         null=True,
-        verbose_name='стоимость хранения за год',
+        verbose_name='общая стоимость хранения за месяц',
         help_text='высчитывается после обработки заявки',
     )
     status = models.CharField(
@@ -145,3 +148,20 @@ class Requestion(models.Model):
         default=Status.SEND,
         verbose_name='статус заявки',
     )
+
+
+@receiver(post_save, sender=Box) 
+def correct_price(sender, instance, created, **kwargs):
+    if instance.requestion:
+        req = instance.requestion
+        new_price = Requestion.objects.filter(id=req.id)\
+                                      .aggregate(Sum('boxes__price'))
+        print(new_price)
+        req.price = new_price['boxes__price__sum']
+        req.save(update_fields=['price'])
+
+
+@receiver(post_save, sender=Requestion) 
+def correct_price(sender, instance, created, **kwargs):
+    req_price = instance.boxes.all().aggregate(Sum('price'))
+    instance.price = req_price['price__sum']

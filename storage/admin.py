@@ -1,6 +1,11 @@
 from django.contrib import admin
 
-from .models import Storehouse, Box, UserProfile, StorehouseImage
+from .models import Storehouse, Box, UserProfile, StorehouseImage, Requestion
+
+
+@admin.register(Requestion)
+class RequestionAdmin(admin.ModelAdmin):
+    pass
 
 
 @admin.register(UserProfile)
