@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from django.shortcuts import redirect, render
 from django.db.models import Count
 
-from .models import UserProfile, Storehouse
+from .models import UserProfile, Storehouse, Requestion
 
 
 def view_products(request):
@@ -25,7 +25,7 @@ def view_products(request):
             "images": [image.img.url for image in storehouse.images.all()]
         })
 
-    return render(request, template_name="boxes_t.html",
+    return render(request, template_name="boxes.html",
                   context={'storehouses': store_serialized})
 
 
@@ -80,4 +80,26 @@ def login_user(request):
 
 
 def my_rent(request):
-    return render(request, 'my-rent.html')
+    user_a = UserProfile.objects.filter(user=request.user)
+    user = user_a[0]
+    user_rents = (
+        Requestion.objects.select_related("box", "box__storehouse")
+        .filter(user=user)
+        .order_by("status")
+    )
+    user_rent = []
+    for rent in user_rents:
+        user_rent.append({
+            "full_name": rent.user.full_name,
+            "email": rent.user.user.email,
+            "password": rent.user.user.password,
+            "phone_number": rent.user.phone_number,
+            "box": f"{rent.box.storehouse.city} {rent.box.storehouse.address}",
+            "box_number": rent.box.box_number,
+            "rental_period": f"{rent.created_at} - {rent.expiration_at}",
+            "price": rent.price,
+            "status": rent.status,
+        })
+
+
+    return render(request, 'my_rent.html', context={'user':user_rent[0]})

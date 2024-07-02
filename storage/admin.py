@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Storehouse, Box, UserProfile, StorehouseImage
+from .models import Storehouse, Box, UserProfile, StorehouseImage, Requestion
 
 
 @admin.register(UserProfile)
@@ -21,3 +21,8 @@ class BoxAdmin(admin.ModelAdmin):
 class StorehouseImageAdmin(admin.ModelAdmin):
     list_display = ['storehouse', 'number_pic', 'img']
     raw_id_fields = ['storehouse']
+
+
+@admin.register(Requestion)
+class RequestionAdmin(admin.ModelAdmin):
+    pass
