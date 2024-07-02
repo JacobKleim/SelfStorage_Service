@@ -21,7 +21,6 @@ def count(request):
 def view_products(request):
     storehouses = Storehouse.objects.prefetch_related('images').annotate(
         boxes_count=Count('boxes'))
-    print(storehouses)
     store_serialized = []
     for storehouse in storehouses:
         store_serialized.append({
