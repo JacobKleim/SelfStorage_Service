@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from django.shortcuts import redirect, render
 from django.db.models import Count
 
-from .models import UserProfile, Storehouse, Requestion
+from .models import UserProfile, Storehouse, Requestion, Box
 
 
 def view_products(request):
@@ -22,11 +22,28 @@ def view_products(request):
             "contact_phone": storehouse.contact_phone,
             "temperature": storehouse.temperature,
             "boxes_count": storehouse.boxes_count,
-            "images": [image.img.url for image in storehouse.images.all()]
+            "images": [image.img.url for image in storehouse.images.all()],
+            #"boxes_n": [i.box_number for i in storehouse.boxes.all()],
+        })
+    print(store_serialized)
+
+    boxes_all = Box.objects.all()
+    boxes = []
+    for box in boxes_all:
+        boxes.append({
+            "box_number": box.box_number,
+            "box_floor": box.floor,
+            "box_height": box.height,
+            "box_length": box.length,
+            "box_width": box.width,
+            "box_price": box.price,
         })
 
-    return render(request, template_name="boxes.html",
-                  context={'storehouses': store_serialized})
+
+    return render(request, template_name="boxes.html", context={
+                      'storehouses': store_serialized,
+                      'boxes': boxes,
+                  })
 
 
 def register_user(request):
@@ -80,26 +97,38 @@ def login_user(request):
 
 
 def my_rent(request):
-    user_a = UserProfile.objects.filter(user=request.user)
-    user = user_a[0]
+    user = UserProfile.objects.filter(user=request.user)
+    user_main = request.user
+    form = []
+    boxes = []
     user_rents = (
         Requestion.objects.select_related("box", "box__storehouse")
-        .filter(user=user)
+        .filter(user=user[0])
         .order_by("status")
     )
-    user_rent = []
-    for rent in user_rents:
-        user_rent.append({
-            "full_name": rent.user.full_name,
-            "email": rent.user.user.email,
-            "password": rent.user.user.password,
-            "phone_number": rent.user.phone_number,
-            "box": f"{rent.box.storehouse.city} {rent.box.storehouse.address}",
-            "box_number": rent.box.box_number,
-            "rental_period": f"{rent.created_at} - {rent.expiration_at}",
-            "price": rent.price,
-            "status": rent.status,
+    if not user_rents.exists():
+        form.append({
+            "email": user_main.email,
+            "password": user_main.password,
+            "full_name": user_main.username,
         })
+    else:
+        for rent in user_rents:
+            form.append({
+                "full_name": rent.user.full_name,
+                "email": rent.user.user.email,
+                "password": rent.user.user.password,
+                "phone_number": rent.user.phone_number,
+            })
+            boxes.append({
+                "box": f"{rent.box.storehouse.city} {rent.box.storehouse.address}",
+                "box_number": rent.box.box_number,
+                "rental_period": f"{rent.created_at} - {rent.expiration_at}",
+                "price": rent.price,
+                "status": rent.status,
+            })
 
-
-    return render(request, 'my_rent.html', context={'user':user_rent[0]})
+    return render(request, 'my_rent.html', context={
+        'users': form,
+        'boxes_rent': boxes,
+    })

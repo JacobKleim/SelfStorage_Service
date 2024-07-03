@@ -21,14 +21,16 @@ my_rent
 							<img src="{% static 'img/image10.png' %}" class="rounded-pill mb-3" alt="">
 
 
-							<h4>{{user.full_name}}</h4>
+
+
+							<h4>{{users.0.full_name}}</h4>
 						</div>
 						<div class="col-12 col-sm-7 d-flex flex-column">
 							<form>
 								<label class="fs_24 SelfStorage_green ms-2" for="EMAIL">E-mail</label>
-								<input type="email" name="EMAIL_EDIT" id="EMAIL" class="form-control fs_24 ps-2 SelfStorage__input" value="{{user.email}}" disabled>
+								<input type="email" name="EMAIL_EDIT" id="EMAIL" class="form-control fs_24 ps-2 SelfStorage__input" value="{{users.0.email}}" disabled>
 								<label class="fs_24 SelfStorage_green ms-2" for="PHONE">Телефон</label>
-								<input type="tel" name="PHONE_EDIT" id="PHONE" class="form-control fs_24 ps-2 SelfStorage__input" value="{{user.phone_number}}" disabled>
+								<input type="tel" name="PHONE_EDIT" id="PHONE" class="form-control fs_24 ps-2 SelfStorage__input" value="{{users.0.phone_number}}" disabled>
 								<label class="fs_24 SelfStorage_green ms-2" for="PASSWORD">Пароль</label>
 								<input type="password" name="PASSWORD_EDIT" id="PASSWORD" class="form-control fs_24 ps-2 SelfStorage__input" value="111111111" disabled>
 								<button type="submit" class="btn SelfStorage_green ps-1" id="save" style="display: none">Сохранить</button>
@@ -56,9 +58,10 @@ my_rent
 								</script>
 							</form>
 						</div>
+
 					</div>
 				</div>
-				 {% if user.status == 'FD' %}
+				 {% if boxes_rent.0.status == 'FD' %}
 
 				{% include 'includes/is_rent.html' %}
 				{% else %}
