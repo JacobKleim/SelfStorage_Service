@@ -106,7 +106,7 @@ def my_rent(request, user_id):
         .filter(user=user_profile)
         .order_by("status")
     )
-    print(user_rents)
+
     if not user_rents:
         form.append({
             "email": user_profile.user.email,
