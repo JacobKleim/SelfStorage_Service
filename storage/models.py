@@ -3,6 +3,10 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.utils import timezone
 from phonenumber_field.modelfields import PhoneNumberField
+from django.dispatch import receiver
+from django.db.models.signals import post_save
+from django.db.models import Sum
+
 
 
 class UserProfile(models.Model):
@@ -102,6 +106,14 @@ class Box(models.Model):
         db_index=True,
         validators=[MinValueValidator(0)]
     )
+    requestion = models.ForeignKey(
+        'Requestion',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        verbose_name='Заявка на аренду',
+        related_name='boxes'
+    )
 
     def __str__(self):
         return self.box_number
@@ -132,13 +144,23 @@ class Requestion(models.Model):
         on_delete=models.CASCADE,
         verbose_name="Арендатор",
         related_name="rents",
+        null=True,
+        blank=True,
     )
+    mail = models.EmailField(
+        blank=True,
+        verbose_name='Почта пользователя',
+    )
+    """
     box = models.ForeignKey(
         Box,
         on_delete=models.CASCADE,
         verbose_name="Бокс",
-        related_name="rents"
+        related_name="rents",
+        null=True,
+        blank=True,
     )
+    """
     created_at = models.DateField(
         verbose_name="Дата создания",
         default=timezone.now,
@@ -166,5 +188,21 @@ class Requestion(models.Model):
         verbose_name = "Аренда"
         verbose_name_plural = "Аренды"
 
-    def __str__(self):
-        return f"{self.user.full_name} on box {self.box.box_number}"
+
+
+@receiver(post_save, sender=Box) 
+def correct_price(sender, instance, created, **kwargs):
+    if instance.requestion:
+        req = instance.requestion
+        new_price = Requestion.objects.filter(id=req.id)\
+                                      .aggregate(Sum('boxes__price'))
+        req.price = new_price['boxes__price__sum']
+        req.save(update_fields=['price'])
+
+
+@receiver(post_save, sender=Requestion) 
+def correct_price(sender, instance, created, **kwargs):
+    if instance.boxes.exists():
+        req_price = instance.boxes.all().aggregate(Sum('price'))
+        instance.price = req_price['price__sum']
+
