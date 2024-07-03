@@ -1,7 +1,7 @@
-from django.utils import timezone
 from django.contrib.auth.models import User
-from django.core.validators import MinValueValidator, MaxValueValidator
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
+from django.utils import timezone
 from phonenumber_field.modelfields import PhoneNumberField
 
 
@@ -66,8 +66,6 @@ class StorehouseImage(models.Model):
         return f'{self.number_pic} {self.storehouse}'
 
 
-
-
 class Box(models.Model):
     storehouse = models.ForeignKey(
         Storehouse,
@@ -108,6 +106,7 @@ class Box(models.Model):
     def __str__(self):
         return self.box_number
 
+
 class Requestion(models.Model):
     """Запрос на хранение вещей."""
 
@@ -118,7 +117,8 @@ class Requestion(models.Model):
             CONTACTED - с клиентом связались для уточнения деталей и оплаты
             PAID - оплачено
             DELIVERED - доставляется
-            FINISHED - заявка завершена(либо клиент отказался либо товар приехал).
+            FINISHED - заявка завершена(либо клиент
+            отказался либо товар приехал).
         """
         SEND = 'SD', 'Send'
         VIEWED = 'VD', 'Viewed'
@@ -168,4 +168,3 @@ class Requestion(models.Model):
 
     def __str__(self):
         return f"{self.user.full_name} on box {self.box.box_number}"
-

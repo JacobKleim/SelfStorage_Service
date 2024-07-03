@@ -1,10 +1,10 @@
 from django.contrib import messages
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
-from django.shortcuts import redirect, render
 from django.db.models import Count
+from django.shortcuts import get_object_or_404, redirect, render
 
-from .models import UserProfile, Storehouse, Requestion, Box
+from .models import Box, Requestion, Storehouse, UserProfile
 
 
 def view_products(request):
@@ -38,7 +38,6 @@ def view_products(request):
             "box_width": box.width,
             "box_price": box.price,
         })
-
 
     return render(request, template_name="boxes.html", context={
                       'storehouses': store_serialized,
@@ -86,7 +85,9 @@ def login_user(request):
         if user is not None:
             login(request, user)
             messages.success(request, 'Вы успешно вошли в систему.')
-            return redirect('my_rent')
+            user_profile = UserProfile.objects.filter(user=user).first()
+            if user_profile:
+                return redirect('my_rent', user_id=user_profile.user_id)
         else:
             messages.error(request, 'Неверный email или пароль.')
             return render(request, 'index.html',
@@ -96,21 +97,22 @@ def login_user(request):
     return render(request, 'index.html')
 
 
-def my_rent(request):
-    user = UserProfile.objects.filter(user=request.user)
-    user_main = request.user
+def my_rent(request, user_id):
+    user_profile = get_object_or_404(UserProfile, user_id=user_id)
     form = []
     boxes = []
     user_rents = (
         Requestion.objects.select_related("box", "box__storehouse")
-        .filter(user=user[0])
+        .filter(user=user_profile)
         .order_by("status")
     )
-    if not user_rents.exists():
+    print(user_rents)
+    if not user_rents:
         form.append({
-            "email": user_main.email,
-            "password": user_main.password,
-            "full_name": user_main.username,
+            "email": user_profile.user.email,
+            "password": user_profile.user.password,
+            "full_name": user_profile.full_name,
+            "phone_number": user_profile.phone_number,
         })
     else:
         for rent in user_rents:
@@ -121,7 +123,8 @@ def my_rent(request):
                 "phone_number": rent.user.phone_number,
             })
             boxes.append({
-                "box": f"{rent.box.storehouse.city} {rent.box.storehouse.address}",
+                "box": f"{rent.box.storehouse.city}"
+                       f"{rent.box.storehouse.address}",
                 "box_number": rent.box.box_number,
                 "rental_period": f"{rent.created_at} - {rent.expiration_at}",
                 "price": rent.price,
